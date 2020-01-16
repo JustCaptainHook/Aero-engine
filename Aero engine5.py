@@ -184,29 +184,29 @@ class Power_up(pygame.sprite.Sprite):
                     Enemy.deaths2 = 0 # so that the cycle beggins again
                     Enemy2.deaths2 = 0 # so that the cycle beggins again
             if self.Power_Up2_Go == 1:
-                self.rect.y += 4
-            if self.rect.y == 726: # if power_up is below the screen
-                self.rect.y = -76
-                self.rect.x = random.randint(0,915)
-                self.Power_Up2_Go = False
+                power_up2.rect.y += 2
+            if power_up2.rect.y >= 726: # if power_up is below the screen
+                power_up2.rect.y = -76
+                power_up2.rect.x = random.randint(0,915)
+                power_up2.Power_Up2_Go = False
             if pygame.sprite.collide_rect(power_up2, PlayerOne) == 1: # if PlayerOne hits it
-                if menu.vel <= 10:
+                if menu.vel < 10:
                     menu.vel += 0.50
-                self.rect.y = -76
-                self.rect.x = random.randint(0,915)
+                power_up2.rect.y = -76
+                power_up2.rect.x = random.randint(0,915)
                 self.Power_Up2_Go = False
                 if Enemy.speed >= 3:
                     menu.vel += 0.5
             if pygame.sprite.collide_rect(power_up2, PlayerTwo) == 1: # if PlayerTwo hits it
-                if menu.vel <= 10:
+                if menu.vel < 10:
                     menu.vel += 0.50
                 self.Power_Up2_Go = False
-                self.rect.y = -76
-                self.rect.x = random.randint(0,915)
+                power_up2.rect.y = -76
+                power_up2.rect.x = random.randint(0,915)
         def move(self):
             if players == 2:
                 if Enemy2.deaths + Enemy.deaths >= 10: # when power_up should move
-                    if Enemy.speed >= 3: #when the speed is very high the power up should go
+                    if Enemy.speed >= 2: #when the speed is very high the power up should go
                         self.Power_Up_Go = True
                     Enemy.deaths = 0 # so that the cycle beggins again
                     Enemy2.deaths = 0 # so that the cycle beggins again
@@ -214,50 +214,47 @@ class Power_up(pygame.sprite.Sprite):
                     Enemy.speed += 0.25 # so that the speed changes
             if players == 1:
                 if Enemy2.deaths + Enemy.deaths >= 5: # when power_up should move
-                    if Enemy.speed >= 3: #when the speed is very high the power up should go
+                    if Enemy.speed >= 2: #when the speed is very high the power up should go
                         self.Power_Up_Go = True
                     Enemy.deaths = 0 # so that the cycle beggins again
                     Enemy2.deaths = 0 # so that the cycle beggins again
                     Enemy2.speed += 0.25 # so that the speed changes
                     Enemy.speed += 0.25 # so that the speed changes
             if self.Power_Up_Go == 1:
-                self.rect.y += 1
+                power_up.rect.y += 1
             if self.rect.y == 726: # if power_up is below the screen
-                self.rect.y = -76
-                self.rect.x = random.randint(0,915)
-                self.Power_Up_Go = False
+                power_up.rect.y = -76
+                power_up.rect.x = random.randint(0,915)
+                power_up.Power_Up_Go = False
             if pygame.sprite.collide_rect(power_up, PlayerOne) == 1: # if PlayerOne hits it
                 if PlayerOne.live < 3: # if the lives of player one are lower than 3 give a hearth
                     PlayerOne.live += 1
-                self.rect.y = -76
-                self.rect.x = random.randint(0,915)
+                power_up.rect.y = -76
+                power_up.rect.x = random.randint(0,915)
                 self.Power_Up_Go = False
             if pygame.sprite.collide_rect(power_up, PlayerTwo) == 1: # if PlayerTwo hits it
                 if PlayerTwo.live < 3: # if the lives of player two are lower than 3 give a hearth
                     PlayerTwo.live += 1
                 self.Power_Up_Go = False
-                self.rect.y = -76
-                self.rect.x = random.randint(0,915)
-                if Enemy.speed >= 3:
-                    menu.vel += 0.5
+                power_up.rect.y = -76
+                power_up.rect.x = random.randint(0,915)
 
 class X_wing(pygame.sprite.Sprite):
     def __init__(self,X_wing,x,y):
         self.X_wing = X_wing
         self.rect = pygame.Rect((x,y), self.X_wing.get_rect().size)
-        #x and y from the ship
-        self.rect.x = x
-        self.rect.y = y
         pygame.sprite.Sprite.__init__(self) # making a sprite of the class
         self.bullets = Bullet(self.rect.copy(),40) # so that the two rects don't collide
         self.deaths = 0
         self.deaths2 = 0
         self.speed = 1
         self.bullets = [Bullet(self.rect.copy(),40)]
+        self.X_wing_Go = True
         
     def draw(self):
-        global players
-        win.blit(self.X_wing, (self.rect.x, self.rect.y))# draw x wing
+        global players, score
+        if self.X_wing_Go == True:
+            win.blit(self.X_wing, (self.rect.x, self.rect.y))# draw x wing
         if players == 1 or players == 2: # if there are 1 or 2 players, move
             Enemy.move()
         if players == 2: # if there are 2 players, move
@@ -284,6 +281,7 @@ class X_wing(pygame.sprite.Sprite):
         if pygame.sprite.collide_rect(Enemy,PlayerOne.bullets[0]) == 1: # when bullet from PlayerOne hits it, mark a death
             self.deaths += 1
             self.deaths2 += 1
+            home_one.score += 1
             score += 1
             PlayerOne.shooting = False
             self.rect.y = -76
@@ -292,6 +290,7 @@ class X_wing(pygame.sprite.Sprite):
             if pygame.sprite.collide_rect(Enemy,PlayerTwo.bullets[0]) == 1: # when bullet from PlayerTwo hits it, mark a death
                 self.deaths += 1
                 self.deaths2 += 1
+                home_one.score += 1
                 score += 1
                 PlayerOne.shooting = False
                 self.rect.y = -76
@@ -315,16 +314,55 @@ class X_wing(pygame.sprite.Sprite):
             self.rect.x = random.randint(50,915)
         if pygame.sprite.collide_rect(Enemy2,PlayerOne.bullets[0]) == 1: # when bullet from PlayerOne hits it
             self.deaths += 1
+            self.deaths2 += 1
+            home_one.score += 1
             score += 1
             PlayerTwo.shooting2 = False
             self.rect.y = -76
             self.rect.x = random.randint(50,915)
         if pygame.sprite.collide_rect(Enemy2,PlayerTwo.bullets[0]) == 1: # when bullet from PlayerTwo hits it
             self.deaths += 1
+            self.deaths2 += 1
+            home_one.score += 1
             score += 1
             PlayerTwo.shooting2 = False
             self.rect.y = -76
             self.rect.x = random.randint(50,915)
+
+class Home_one(pygame.sprite.Sprite):
+    def __init__(self):
+        self.image = image("Home one.png")
+        self.rect = pygame.Rect((225,-450), self.image.get_rect().size)
+        self.score = 0
+        self.Ho_go = False
+        self.Ho_x = 1
+    def draw(self):
+        win.blit(self.image,(self.rect.x,self.rect.y))
+        home_one.move()
+    def move(self):
+        if self.score == 1:
+            Enemy.X_wing_Go = False
+            Enemy2.X_wing_Go = False
+            self.Ho_go = True
+            self.score = 0
+        if self.Ho_go == True:
+            Enemy2.rect.y = -76
+            Enemy.rect.y = -76
+            self.rect.y += 2
+            self.Ho_x = 2
+            if self.rect.y == 0:
+                self.Ho_go = False
+        if self.rect.y == 0:
+            if self.Ho_x == 2:
+                if self.rect.x <= 670:
+                    self.rect.x += 2
+                if self.rect.x == 669:
+                    self.Ho_x = 3
+            if self.Ho_x == 3:
+                if self.rect.x >= 0:
+                    self.rect.x -= 2
+                if self.rect.x == 0:
+                    self.Ho_x = 2
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -346,8 +384,9 @@ PlayerOne = Player(3, image("Tiefighter1.png"),425,325)
 PlayerTwo = Player(3,image("Tiefighter1.png"),525,325)
 Enemy = X_wing(image("X_wing.PNG"),random.randint(50,915),-200)
 Enemy2 = X_wing(image("X_wing.PNG"),random.randint(50,915),-200)
-power_up =  Power_up(random.randint(0,915), -76,pygame.image.load("Power_up.PNG"))
+home_one = Home_one()
 power_up2 =  Power_up(random.randint(0,915), -76,pygame.image.load("Power_up2.PNG"))
+power_up =  Power_up(random.randint(0,915), -76,pygame.image.load("Power_up.PNG"))
 menu = Menu()
 
 
@@ -359,11 +398,12 @@ while run:
     win.blit(pygame.image.load("Background.png"),(0,backy1)) # make the background black
     win.blit(pygame.image.load("Background.png"),(0,backy2))
     win.blit(pygame.image.load("darth-vader-helmet.png"),(500,darthy))
-
+    home_one.draw()
     if players >= 1: # if there are one or two players draw them
         PlayerOne.draw()
         Enemy.draw()
         power_up.draw()
+        power_up2.draw()
     if players == 1:
         PlayerTwo.live = 0
     if players > 1: # if there are two players draw them
@@ -395,15 +435,14 @@ while run:
         backy1 = -650
     if backy2 == 650:
         backy2 = -650
-    if key[pygame.K_b] and key[pygame.K_n]:
+    if key[pygame.K_j] and key[pygame.K_h]:
         if darthy >= 380:
             darthy -= 10
     else:
         if darthy <= 650:
             darthy += 10
-    #print(menu.vel)
-    print(Enemy.speed)
-
+    if key[pygame.K_0] and key[pygame.K_MINUS]:
+        menu.vel = 15
 
     for event in pygame.event.get(): # when pressed quit
         if event.type == pygame.QUIT or key[pygame.K_ESCAPE]:
